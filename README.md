@@ -2,32 +2,145 @@
 
 Projet ROS2 Jazzy pour robot mecanum équipé d'un lidar RPlidar A1 avec communication entre Raspberry Pi et machine de monitoring distante.
 
-## 📋 Table des Matières
-
-- [Description](#description)
-- [Architecture](#architecture)
-- [Prérequis](#prérequis)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Utilisation](#utilisation)
-- [Dépannage](#dépannage)
-- [Développement](#développement)
-- [Licence](#licence)
-
 ## 🎯 Description
 
-# SBC_RobotMecanum
-
-Projet ROS2 Jazzy pour robot à roues mecanum équipé d'un lidar RPlidar A1. Ce projet permet la communication entre deux machines : la Raspberry Pi embarquée et une machine de monitoring distant via les topics ROS2.
-
-## 🤖 Description
-
-Ce projet implémente un système de contrôle et de monitoring pour un robot à roues mecanum avec les fonctionnalités suivantes :
+Ce projet implémente un système de contrôle et de monitoring pour un robot à roues mecanum avec :
 
 - **Contrôle du robot** : Gestion des mouvements omnidirectionnels
-- **Acquisition lidar** : Traitement des données du RPlidar A1
-- **Communication réseau** : Pont TCP pour communication inter-machines
-- **Monitoring** : Interface console + visualisation Gazebo/RViz
+- **Acquisition lidar** : Données du RPlidar A1 sur le topic `/scan`
+- **Communication réseau** : Configuration automatique ROS2 multi-machines
+- **Monitoring** : Visualisation des données lidar à distance
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────┐    ROS2 Topics    ┌─────────────────────┐
+│   Raspberry Pi      │◄─────────────────►│  Machine Monitoring │
+│                     │    /scan          │                     │
+│ ┌─────────────────┐ │    /robot_status  │ ┌─────────────────┐ │
+│ │ Robot Controller│ │    /cmd_vel       │ │   Monitoring    │ │
+│ │ Lidar Processor │ │                   │ │   RViz2         │ │
+│ └─────────────────┘ │                   │ └─────────────────┘ │
+│         │           │                   │                     │
+│    ┌────▼────┐      │                   │                     │
+│    │ RPlidar │      │                   │                     │
+│    │   A1    │      │                   │                     │
+│    └─────────┘      │                   │                     │
+└─────────────────────┘                   └─────────────────────┘
+```
+
+## 🔧 Installation
+
+### Prérequis
+- ROS2 Jazzy
+- RPlidar A1 connecté en USB
+- Réseau commun entre les machines
+
+### Installation Rapide
+```bash
+git clone https://github.com/AxeDelUbac/SBC_RobotMecanum.git
+cd SBC_RobotMecanum
+colcon build --packages-select mecanum_robot
+source install/setup.bash
+```
+
+## 🚀 Utilisation
+
+### 🤖 Sur la Machine Robot (Raspberry Pi)
+
+```bash
+# Lancer le lidar (configure automatiquement le réseau)
+ros2 launch mecanum_robot lidar_launch.py
+```
+
+### 💻 Sur la Machine de Monitoring
+
+```bash
+# Option 1: Monitoring simple
+ros2 topic echo /scan
+
+# Option 2: Monitoring avec interface
+ros2 launch mecanum_robot monitoring_launch.py
+
+# Option 3: Visualisation RViz
+rviz2
+# Ajouter un affichage LaserScan avec topic /scan
+```
+
+## ⚙️ Configuration Réseau
+
+**Configuration automatique !** Les launch files configurent automatiquement :
+- `ROS_DOMAIN_ID=42` (identique sur toutes les machines)
+- `ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET` (découverte réseau)
+- `ROS_LOCALHOST_ONLY=0` (communication réseau autorisée)
+
+La configuration se trouve dans `config/ros2_network_config.yaml` et `config/rplidar_config.yaml`.
+
+## 🔍 Topics Principaux
+
+- `/scan` - Données lidar (sensor_msgs/LaserScan)
+- `/robot_status` - État du robot
+- `/cmd_vel` - Commandes de vitesse
+
+## 🛠️ Dépannage
+
+### Problèmes Courants
+
+1. **Lidar non détecté**
+   ```bash
+   # Vérifier la connexion
+   ls -la /dev/ttyUSB*
+   sudo chmod 666 /dev/ttyUSB0
+   ```
+
+2. **Communication réseau impossible**
+   ```bash
+   # Vérifier la connectivité
+   ping <IP_autre_machine>
+   ros2 topic list
+   ```
+
+3. **Package non trouvé**
+   ```bash
+   colcon build --packages-select mecanum_robot
+   source install/setup.bash
+   ```
+
+## 📁 Structure du Projet
+
+```
+src/mecanum_robot/
+├── launch/
+│   ├── lidar_launch.py          # Lance lidar + config réseau
+│   └── monitoring_launch.py     # Lance monitoring + config réseau
+├── config/
+│   ├── rplidar_config.yaml      # Configuration lidar
+│   └── ros2_network_config.yaml # Configuration réseau
+└── mecanum_robot/               # Nodes Python
+    ├── robot_controller.py
+    ├── lidar_processor.py
+    └── communication_bridge.py
+```
+
+## 📋 Commandes Utiles
+
+```bash
+# Voir les topics actifs
+ros2 topic list
+
+# Informations sur le topic scan
+ros2 topic info /scan
+ros2 topic hz /scan
+
+# Envoyer une commande de vitesse
+ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.2}}"
+```
+
+Pour plus de détails, voir `MULTI_MACHINE_SETUP.md`.
+
+---
+
+**Développé pour le projet LEROBOT** 🤖
 
 ## 🏗️ Architecture
 

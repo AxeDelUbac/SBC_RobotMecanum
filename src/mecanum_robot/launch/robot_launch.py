@@ -27,7 +27,6 @@ def generate_launch_description():
     
     # Configuration files
     rplidar_config = os.path.join(pkg_mecanum_robot, 'config', 'rplidar_config.yaml')
-    robot_config = os.path.join(pkg_mecanum_robot, 'config', 'robot_config.yaml')
     
     # RPlidar node
     rplidar_node = Node(
@@ -44,7 +43,6 @@ def generate_launch_description():
         package='mecanum_robot',
         executable='robot_controller.py',
         name='robot_controller',
-        parameters=[robot_config],
         output='screen',
         condition=IfCondition(
             PythonExpression([
@@ -58,7 +56,6 @@ def generate_launch_description():
         package='mecanum_robot',
         executable='lidar_processor.py',
         name='lidar_processor',
-        parameters=[robot_config],
         output='screen',
         condition=IfCondition(LaunchConfiguration('use_lidar'))
     )
@@ -68,7 +65,6 @@ def generate_launch_description():
         package='mecanum_robot',
         executable='communication_bridge.py',
         name='communication_bridge',
-        parameters=[robot_config],
         output='screen'
     )
     

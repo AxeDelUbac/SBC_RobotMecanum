@@ -24,16 +24,12 @@ def generate_launch_description():
         description='Use GUI monitor (true) or console monitor (false)'
     )
     
-    # Configuration files
-    robot_config = os.path.join(pkg_mecanum_robot, 'config', 'robot_config.yaml')
-    
     # Console monitor node (par défaut)
     console_monitor_node = Node(
         package='mecanum_robot',
         executable='console_monitor.py',
         name='console_monitor',
         parameters=[
-            robot_config,
             {'monitoring_ip': LaunchConfiguration('monitoring_ip')}
         ],
         output='screen'

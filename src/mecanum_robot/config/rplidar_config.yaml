@@ -1,7 +1,7 @@
 # Configuration pour le lidar RPlidar A1
-rplidar:
+rplidar_composition:
   ros__parameters:
-    # Port série du lidar (adapter selon votre configuration)
+    # Port série du lidar
     serial_port: "/dev/ttyUSB0"
     serial_baudrate: 115200
     
@@ -10,12 +10,15 @@ rplidar:
     inverted: false
     angle_compensate: true
     
-    # Paramètres de scan
-    scan_mode: "Boost"  # "Standard", "Express", "Boost"
+    # Paramètres de scan pour RPlidar A1
+    scan_mode: "Standard"  # "Standard" est plus stable pour A1
     
-    # Filtres
-    range_min: 0.15  # mètres
-    range_max: 12.0  # mètres
+    # Filtres de distance
+    range_min: 0.15  # mètres (minimum pour A1)
+    range_max: 12.0  # mètres (maximum pour A1)
     
     # Fréquence de publication
     scan_frequency: 10.0  # Hz
+    
+    # Paramètres additionnels pour la stabilité
+    auto_standby: true

@@ -10,8 +10,8 @@ robot:
     
     # Communication
     network:
-      monitoring_ip: "192.168.1.100"  # IP de la machine de monitoring
-      robot_ip: "192.168.1.101"       # IP de la Raspberry Pi
+      monitoring_ip: "192.168.2.134"  # IP de la machine de monitoring (cette machine)
+      robot_ip: "192.168.2.5"         # IP de la Raspberry Pi (destination SSH)
       communication_port: 11511
     
     # Capteurs
