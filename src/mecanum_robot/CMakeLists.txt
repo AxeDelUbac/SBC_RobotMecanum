@@ -28,21 +28,21 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
-# Generate custom messages
-set(msg_files
-  "msg/RobotStatus.msg"
-  "msg/SensorData.msg"
-)
+# Generate custom messages (commenté temporairement pour éviter les problèmes de dépendances)
+# set(msg_files
+#   "msg/RobotStatus.msg"
+#   "msg/SensorData.msg"
+# )
 
-set(srv_files
-  "srv/SetRobotMode.srv"
-)
+# set(srv_files
+#   "srv/SetRobotMode.srv"
+# )
 
-rosidl_generate_interfaces(${PROJECT_NAME}
-  ${msg_files}
-  ${srv_files}
-  DEPENDENCIES std_msgs sensor_msgs geometry_msgs
-)
+# rosidl_generate_interfaces(${PROJECT_NAME}
+#   ${msg_files}
+#   ${srv_files}
+#   DEPENDENCIES std_msgs sensor_msgs geometry_msgs
+# )
 
 # Include directories
 include_directories(include)
@@ -53,7 +53,7 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   mecanum_robot/robot_controller.py
-  mecanum_robot/remote_monitor.py
+  mecanum_robot/console_monitor.py
   mecanum_robot/lidar_processor.py
   mecanum_robot/communication_bridge.py
   DESTINATION lib/${PROJECT_NAME}

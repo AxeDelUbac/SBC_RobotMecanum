@@ -16,14 +16,130 @@ Projet ROS2 Jazzy pour robot mecanum équipé d'un lidar RPlidar A1 avec communi
 
 ## 🎯 Description
 
-Ce projet implémente un système complet pour un robot mecanum avec les fonctionnalités suivantes :
+# SBC_RobotMecanum
 
-- **Navigation autonome** avec lidar RPlidar A1
-- **Communication multi-machine** via ROS2 topics
-- **Interface de monitoring distant** avec contrôle manuel
-- **Integration microcontrôleur** pour le contrôle des moteurs et odométrie
-- **Messages personnalisés** pour le statut robot et données capteurs
-- **Bridge de communication réseau** TCP pour la synchronisation
+Projet ROS2 Jazzy pour robot à roues mecanum équipé d'un lidar RPlidar A1. Ce projet permet la communication entre deux machines : la Raspberry Pi embarquée et une machine de monitoring distant via les topics ROS2.
+
+## 🤖 Description
+
+Ce projet implémente un système de contrôle et de monitoring pour un robot à roues mecanum avec les fonctionnalités suivantes :
+
+- **Contrôle du robot** : Gestion des mouvements omnidirectionnels
+- **Acquisition lidar** : Traitement des données du RPlidar A1
+- **Communication réseau** : Pont TCP pour communication inter-machines
+- **Monitoring** : Interface console + visualisation Gazebo/RViz
+
+## 🏗️ Architecture
+
+### Machines
+- **Raspberry Pi** : Contrôle robot + acquisition capteurs
+- **Machine de monitoring** : Surveillance à distance + visualisation
+
+### Nodes ROS2
+- `robot_controller.py` : Contrôle des moteurs et mouvements
+- `lidar_processor.py` : Traitement des données lidar
+- `console_monitor.py` : Interface de monitoring console
+- `communication_bridge.py` : Pont de communication TCP
+
+## 📦 Installation
+
+### Prérequis
+- ROS2 Jazzy
+- Python 3.10+
+- Raspberry Pi OS (pour la Pi) ou Ubuntu 22.04+ (monitoring)
+
+### Raspberry Pi
+```bash
+cd SBC_RobotMecanum
+./scripts/install_robot.sh
+```
+
+### Machine de monitoring
+```bash
+cd SBC_RobotMecanum
+./scripts/install_monitoring.sh
+```
+
+## 🚀 Utilisation
+
+### Démarrage du robot (Raspberry Pi)
+```bash
+~/start_robot.sh
+```
+
+### Monitoring distant
+```bash
+# Interface console
+~/start_monitoring.sh
+
+# Visualisation avec RViz et Gazebo
+~/start_gazebo_rviz.sh
+
+# Vérification de connexion
+~/check_robot_connection.sh
+```
+
+### Topics ROS2 principaux
+- `/scan` : Données lidar (sensor_msgs/LaserScan)
+- `/cmd_vel` : Commandes de vitesse (geometry_msgs/Twist)
+- `/robot_status` : État du robot
+
+## 🔧 Configuration
+
+La configuration se trouve dans `src/mecanum_robot/config/robot_config.yaml` :
+- Adresses IP des machines
+- Paramètres du lidar
+- Configuration des moteurs
+- Ports de communication
+
+## 🎯 Visualisation
+
+Ce projet utilise les outils standard ROS2 pour la visualisation :
+- **RViz2** : Visualisation des données de capteurs et état du robot
+- **Gazebo** : Simulation (optionnelle)
+- **rqt** : Outils de debug et monitoring ROS2
+
+### Configuration RViz recommandée
+- Ajouter `/scan` pour visualiser les données lidar
+- Ajouter `/tf` pour les transformations
+- Ajouter `/cmd_vel` pour les commandes de vitesse
+
+## 🌐 Communication
+
+Le système utilise deux modes de communication :
+- **ROS2 DDS** : Communication principale via topics
+- **TCP Bridge** : Communication de secours et données spécifiques
+
+Port par défaut : 11511
+
+## 🛠️ Développement
+
+### Compilation
+```bash
+source /opt/ros/jazzy/setup.bash
+colcon build --symlink-install
+source install/setup.bash
+```
+
+### Structure du projet
+```
+src/mecanum_robot/
+├── mecanum_robot/           # Code Python des nodes
+├── launch/                  # Fichiers de lancement
+├── config/                  # Fichiers de configuration
+└── package.xml             # Métadonnées du package
+```
+
+## 📋 TODO
+- [ ] Intégration encodeurs roues
+- [ ] Navigation autonome
+- [ ] Cartographie SLAM
+- [ ] Interface web (optionnelle)
+
+## 🔗 Liens utiles
+- [ROS2 Jazzy Documentation](https://docs.ros.org/en/jazzy/)
+- [RPlidar A1 Manual](https://www.slamtec.com/en/Lidar/A1)
+- [Gazebo Documentation](https://gazebosim.org/docs)
 
 ### Composants Principaux
 

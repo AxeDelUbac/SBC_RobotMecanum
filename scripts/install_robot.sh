@@ -42,14 +42,27 @@ check_ros2() {
 install_system_dependencies() {
     print_status "Installation des dépendances système..."
     sudo apt update
+    
+    # Packages essentiels
     sudo apt install -y \
         python3-pip \
         python3-serial \
         python3-psutil \
         python3-numpy \
-        python3-tkinter \
         udev \
         git
+    
+    # Tkinter (optionnel pour interface graphique)
+    if apt-cache search python3-tkinter | grep -q python3-tkinter; then
+        sudo apt install -y python3-tkinter
+        print_status "python3-tkinter installé"
+    elif apt-cache search python3-tk | grep -q python3-tk; then
+        sudo apt install -y python3-tk
+        print_status "python3-tk installé"
+    else
+        print_warning "Tkinter non disponible - interface graphique limitée"
+        print_warning "Utilisez: sudo apt install python3-tk ou pip3 install tk"
+    fi
 }
 
 # Installer les packages ROS2
@@ -122,7 +135,7 @@ setup_environment() {
         echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
         echo "source ~/Documents/Dev/LEROBOT/SBC_RobotMecanum/install/setup.bash" >> ~/.bashrc
         echo "export ROS_DOMAIN_ID=42" >> ~/.bashrc
-        echo "export RMW_IMPLEMENTATION=rmw_cyclonedx_cpp" >> ~/.bashrc
+        echo "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp" >> ~/.bashrc
     fi
     
     # Créer le script de lancement

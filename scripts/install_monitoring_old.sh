@@ -2,11 +2,10 @@
 
 # Script d'installation pour la machine de monitoring
 # À exécuter sur la machine de monitoring distant
-# Version simplifiée - utilise Gazebo et RViz pour le monitoring
 
 set -e
 
-echo "=== Installation Machine de Monitoring (Gazebo/RViz) ==="
+echo "=== Installation Machine de Monitoring ==="
 
 # Couleurs pour l'affichage
 RED='\033[0;31m'
@@ -51,18 +50,6 @@ install_system_dependencies() {
         git
 }
 
-# Installer les packages ROS2 pour monitoring
-install_ros2_packages() {
-    print_status "Installation des packages ROS2 pour monitoring..."
-    sudo apt install -y \
-        ros-jazzy-gazebo-ros-pkgs \
-        ros-jazzy-rviz2 \
-        ros-jazzy-rqt \
-        ros-jazzy-rqt-common-plugins \
-        ros-jazzy-robot-state-publisher \
-        ros-jazzy-joint-state-publisher
-}
-
 # Installer les dépendances Python
 install_python_dependencies() {
     print_status "Installation des dépendances Python..."
@@ -104,7 +91,7 @@ setup_environment() {
         echo "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp" >> ~/.bashrc
     fi
     
-    # Script de monitoring console
+    # Créer le script de lancement pour monitoring console
     cat > ~/start_monitoring.sh << 'EOF'
 #!/bin/bash
 source /opt/ros/jazzy/setup.bash
@@ -118,7 +105,7 @@ ros2 launch mecanum_robot console_monitoring_launch.py
 EOF
     chmod +x ~/start_monitoring.sh
     
-    # Script pour Gazebo et RViz
+    # Script pour lancer Gazebo et RViz
     cat > ~/start_gazebo_rviz.sh << 'EOF'
 #!/bin/bash
 source /opt/ros/jazzy/setup.bash
@@ -127,20 +114,19 @@ export ROS_DOMAIN_ID=42
 
 echo "Démarrage de Gazebo et RViz pour monitoring du robot..."
 
-# Lancer RViz
+# Lancer RViz en arrière-plan
 rviz2 &
 
 echo "RViz lancé. Configurez-le pour afficher:"
-echo "  - /scan (sensor_msgs/LaserScan) pour les données lidar"
-echo "  - /tf (geometry_msgs/TransformStamped) pour les transformations"
-echo "  - /cmd_vel (geometry_msgs/Twist) pour les commandes de vitesse"
+echo "  - /scan (sensor_msgs/LaserScan)"
+echo "  - /robot_status (pour le statut)"
+echo "  - /tf (pour les transformations)"
 echo ""
-echo "Pour lancer Gazebo: gazebo --verbose"
-echo "Pour les outils ROS: rqt"
+echo "Pour Gazebo, utilisez: gazebo --verbose"
 EOF
     chmod +x ~/start_gazebo_rviz.sh
     
-    # Script de vérification de connexion
+    # Script pour vérifier la connexion réseau
     cat > ~/check_robot_connection.sh << 'EOF'
 #!/bin/bash
 ROBOT_IP="192.168.1.101"
@@ -150,9 +136,9 @@ echo "Vérification de la connexion au robot..."
 echo "IP: $ROBOT_IP, Port: $ROBOT_PORT"
 
 if timeout 5 bash -c "</dev/tcp/$ROBOT_IP/$ROBOT_PORT"; then
-    echo "✓ Robot accessible via TCP"
+    echo "✓ Robot accessible"
 else
-    echo "✗ Robot non accessible via TCP"
+    echo "✗ Robot non accessible"
     echo "Vérifiez:"
     echo "  - La connexion réseau"
     echo "  - L'IP du robot dans la configuration"
@@ -161,12 +147,7 @@ fi
 
 echo ""
 echo "Test de connectivité ROS2:"
-echo "Topics disponibles:"
 timeout 10 ros2 topic list
-
-echo ""
-echo "Nodes ROS2 disponibles:"
-timeout 10 ros2 node list
 EOF
     chmod +x ~/check_robot_connection.sh
 }
@@ -175,33 +156,19 @@ EOF
 create_desktop_shortcuts() {
     print_status "Création des raccourcis bureau..."
     
-    # Raccourci pour le monitoring console
-    cat > ~/Desktop/Robot_Console_Monitoring.desktop << EOF
+    # Raccourci pour le monitoring
+    cat > ~/Desktop/Robot_Monitoring.desktop << EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Robot Console Monitoring
-Comment=Interface console de monitoring du robot Mecanum
+Name=Robot Monitoring
+Comment=Interface de monitoring du robot Mecanum
 Exec=$HOME/start_monitoring.sh
-Icon=utilities-terminal
+Icon=applications-development
 Terminal=true
 Categories=Development;
 EOF
-    chmod +x ~/Desktop/Robot_Console_Monitoring.desktop
-    
-    # Raccourci pour Gazebo/RViz
-    cat > ~/Desktop/Robot_Gazebo_RViz.desktop << EOF
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=Robot Gazebo & RViz
-Comment=Lancer Gazebo et RViz pour monitoring du robot
-Exec=$HOME/start_gazebo_rviz.sh
-Icon=applications-science
-Terminal=true
-Categories=Development;
-EOF
-    chmod +x ~/Desktop/Robot_Gazebo_RViz.desktop
+    chmod +x ~/Desktop/Robot_Monitoring.desktop
     
     # Raccourci pour vérifier la connexion
     cat > ~/Desktop/Check_Robot_Connection.desktop << EOF
@@ -215,7 +182,19 @@ Icon=network-wired
 Terminal=true
 Categories=Development;
 EOF
-    chmod +x ~/Desktop/Check_Robot_Connection.desktop
+    # Raccourci pour le monitoring console
+    cat > ~/Desktop/Robot_Console_Monitoring.desktop << EOF
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Robot Console Monitoring
+Comment=Interface console de monitoring du robot Mecanum
+Exec=$HOME/start_console_monitoring.sh
+Icon=utilities-terminal
+Terminal=true
+Categories=Development;
+EOF
+    chmod +x ~/Desktop/Robot_Console_Monitoring.desktop
 }
 
 # Configuration réseau
@@ -228,20 +207,14 @@ configure_network() {
     echo "3. Configurez l'IP de la Raspberry Pi dans le fichier:"
     echo "   ~/Documents/Dev/LEROBOT/SBC_RobotMecanum/src/mecanum_robot/config/robot_config.yaml"
     echo ""
-    echo "4. Pour la visualisation, utilisez:"
-    echo "   - RViz2 pour visualiser les données de capteurs"
-    echo "   - Gazebo pour la simulation (si nécessaire)"
-    echo "   - rqt pour les outils de debug ROS2"
-    echo ""
 }
 
 # Fonction principale
 main() {
-    print_status "Début de l'installation pour la machine de monitoring (Gazebo/RViz)..."
+    print_status "Début de l'installation pour la machine de monitoring..."
     
     check_ros2
     install_system_dependencies
-    install_ros2_packages
     install_python_dependencies
     build_workspace
     setup_environment
@@ -251,7 +224,6 @@ main() {
     print_status "Installation terminée avec succès!"
     print_warning "Redémarrez votre session ou exécutez 'source ~/.bashrc' pour charger l'environnement"
     print_status "Pour démarrer le monitoring: ~/start_monitoring.sh"
-    print_status "Pour lancer RViz et Gazebo: ~/start_gazebo_rviz.sh"
     print_status "Pour vérifier la connexion: ~/check_robot_connection.sh"
 }
 
