@@ -1,0 +1,5 @@
+# Service pour changer le mode du robot
+string mode     # "manual", "auto", "scan", "stop"
+---
+bool success
+string message

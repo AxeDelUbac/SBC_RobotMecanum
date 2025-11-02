@@ -1,0 +1,27 @@
+# Configuration générale du robot
+robot:
+  ros__parameters:
+    robot_id: "mecanum_robot_01"
+    
+    # Paramètres physiques
+    wheel_diameter: 0.1  # mètres
+    wheel_base: 0.3      # distance entre roues avant/arrière
+    track_width: 0.25    # distance entre roues gauche/droite
+    
+    # Communication
+    network:
+      monitoring_ip: "192.168.1.100"  # IP de la machine de monitoring
+      robot_ip: "192.168.1.101"       # IP de la Raspberry Pi
+      communication_port: 11511
+    
+    # Capteurs
+    sensors:
+      lidar_enabled: true
+      odometry_enabled: true
+      microcontroller_port: "/dev/ttyACM0"
+    
+    # Fréquences de publication
+    frequencies:
+      status_hz: 1.0
+      sensor_data_hz: 10.0
+      odometry_hz: 50.0
