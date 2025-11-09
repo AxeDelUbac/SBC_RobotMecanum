@@ -28,6 +28,15 @@
   <depend>laser_geometry</depend>
   <depend>pcl_conversions</depend>
   
+  <!-- Dependencies pour RViz et Gazebo -->
+  <depend>robot_state_publisher</depend>
+  <depend>joint_state_publisher</depend>
+  <depend>joint_state_publisher_gui</depend>
+  <depend>rviz2</depend>
+  <depend>ros_gz_sim</depend>
+  <depend>ros_gz_bridge</depend>
+  <depend>xacro</depend>
+  
   <!-- Dependencies pour les messages personnalisés -->
   <depend>rosidl_default_generators</depend>
   <depend>rosidl_default_runtime</depend>
